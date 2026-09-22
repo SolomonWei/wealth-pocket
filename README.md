@@ -14,7 +14,8 @@ Node 22+: `npm start`, then open http://localhost:4173. `npm test` runs financia
 - Net worth = gross asset values minus outstanding principal and interest. Missing quotes produce an explicit partial total, never a silently complete balance.
 - Watchlist with target-price indicators, separate from holdings. No background alerts.
 - Local JSON persistence, explicit import replacement, backup export, independent demo mode, amount masking.
-- Independent manual USD/TWD and USDT/TWD rates. Default 32 is a placeholder and labeled as such.
+- USD/TWD defaults to Bank of Taiwan USD spot-buy, with quotation time and a manual override. USDT/TWD remains independently manual. Default 32 is a labeled placeholder until a quote is available.
+- GitHub Actions checks the official bank page about every 15 minutes (schedules may be delayed). A failed refresh retains the previous verified quote with a stale status; no quote is fabricated. The app checks the published snapshot every 5 minutes while open.
 
 ## Quote connections
 

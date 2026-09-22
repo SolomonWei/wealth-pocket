@@ -9,7 +9,7 @@ export function normalizeCryptoSymbol(value) {
 export const cryptoAsset = symbol => String(symbol??'').replace(/USDT$/,'');
 export const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export const keyFor = r => `${r.kind}:${r.symbol}`;
-export const emptyState = () => ({version:1,records:[],watch:[],fx:{USD:32,USDT:32},fxDate:today()});
+export const emptyState = () => ({version:1,records:[],watch:[],fx:{USD:32,USDT:32},fxMode:'bot',fxDate:today()});
 export function validateRecord(r,watch=false) {
   if(!r || typeof r!=='object' || !Object.hasOwn(kinds,r.kind)) throw Error('資產類型不正確');
   if(typeof r.id!=='string'||!r.id||r.id.length>100) throw Error('紀錄編號不正確');
@@ -34,6 +34,7 @@ export function validateState(s) {
   const ids=new Set();
   for(const [rows,watch] of [[s.records,false],[s.watch,true]]) for(const r of rows){validateRecord(r,watch);if(ids.has(r.id))throw Error('備份有重複編號');ids.add(r.id);}
   for(const c of ['USD','USDT']) if(!Number.isFinite(s.fx?.[c])||s.fx[c]<=0||s.fx[c]>1e6)throw Error('請填寫有效的換算匯率');
+  if(s.fxMode!==undefined&&!['bot','manual'].includes(s.fxMode))throw Error('匯率來源不正確');
   return s;
 }
 export function interest(r,asOf=today()) {
