@@ -1,6 +1,12 @@
 export const kinds = {tw:'台股',us:'美股',crypto:'虛擬貨幣',cash:'銀行／現金',property:'房產',loan:'貸款'};
 export const marketKinds = ['tw','us','crypto'];
 export const currencyFor = k => ({tw:'TWD',us:'USD',crypto:'USDT'}[k] || 'TWD');
+export function normalizeCryptoSymbol(value) {
+  const symbol=String(value??'').normalize('NFKC').trim().toUpperCase().replace(/\s+/g,'').replace(/\/USDT$/,'USDT');
+  if(!symbol)return '';
+  return symbol.endsWith('USDT')?symbol:symbol+'USDT';
+}
+export const cryptoAsset = symbol => String(symbol??'').replace(/USDT$/,'');
 export const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export const keyFor = r => `${r.kind}:${r.symbol}`;
 export const emptyState = () => ({version:1,records:[],watch:[],fx:{USD:32,USDT:32},fxDate:today()});
