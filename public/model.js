@@ -60,6 +60,20 @@ export function totals(state,quotes={},asOf=today()) {
   const groupNet=Object.fromEntries(Object.keys(kinds).map(k=>[k,(groups[k]||0)-groupDebts[k]]));
   return {assets,debts,net:assets-debts,liquidAssets,marginDebt,financialEquity:liquidAssets-marginDebt,missing,manual,groups,groupDebts,groupMissing,groupNet};
 }
+export function investmentSummary(state,quotes={}) {
+  const result=Object.fromEntries(['all',...marketKinds].map(k=>[k,{pnl:0,count:0,included:0,missingCost:0,missingPrice:0,manual:0}]));
+  for(const r of state.records){
+    if(!marketKinds.includes(r.kind))continue;
+    const v=valuation(r,quotes,state.fx);
+    for(const k of ['all',r.kind]){
+      const group=result[k];group.count++;
+      if(r.cost===null||r.cost===undefined)group.missingCost++;
+      if(v.price===null)group.missingPrice++;
+      if(v.pnl!==null){group.pnl+=v.pnl;group.included++;if(!v.q)group.manual++;}
+    }
+  }
+  return result;
+}
 export function demoState(){const s=emptyState();s.records=[
   {id:'d1',kind:'tw',name:'台積電',symbol:'2330',currency:'TWD',quantity:1000,cost:900,manualPrice:1000,principal:500000,accrued:1250,rate:6,since:today()},
   {id:'d2',kind:'us',name:'NVIDIA',symbol:'NVDA',currency:'USD',quantity:100,cost:100,manualPrice:120,principal:0},

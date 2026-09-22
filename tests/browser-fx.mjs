@@ -14,7 +14,7 @@ try {
   await page.locator('#mobile-nav [data-tab=settings]').click();
   assert.equal(await page.locator('[name=USD]').isDisabled(),true);
   await page.locator('[name=fxMode]').selectOption('manual');await page.locator('[name=USD]').fill('30');await page.locator('#fx-form button').click();
-  await page.reload();assert.equal((await saved()).fx.USD,30);assert.equal((await saved()).fx.USDT,30);assert.equal(await page.locator('[name=USDT]').count(),0);assert.equal(await page.locator('[data-app-version]').textContent(),'v0.3.3');await page.locator('[data-action=reload-app]').click();await page.waitForURL('**?_update=*#settings');assert.equal((await saved()).fx.USD,30);
+  await page.reload();assert.equal((await saved()).fx.USD,30);assert.equal((await saved()).fx.USDT,30);assert.equal(await page.locator('[name=USDT]').count(),0);assert.equal(await page.locator('[data-app-version]').textContent(),'v0.3.4');await page.locator('[data-action=reload-app]').click();await page.waitForURL('**?_update=*#settings');assert.equal((await saved()).fx.USD,30);
   await page.locator('[name=fxMode]').selectOption('bot');await page.locator('#fx-form button').click();
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pocket-assets-v1')).fx.USD===31.645);
   available=false;await page.reload();await page.waitForFunction(()=>document.querySelector('[data-bank-status]')?.textContent.includes('更新延遲'));
