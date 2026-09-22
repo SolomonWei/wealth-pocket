@@ -26,6 +26,6 @@ try{
  await page.locator('[data-edit="tiny"]').click();assert.equal(Number(await page.locator('[name=target]').inputValue()),1.111e-8);await page.locator('[name=target]').fill('0.00000001009');await page.locator('#record-form button[type=submit]').click();await page.reload();assert.match(await row('tiny').locator('.watch-target').innerText(),/0\.00000001009/);
  for(const width of [320,390,1280]){await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
  await page.setViewportSize({width:390,height:844});assert.ok((await row('ctsi').boundingBox()).height<=100);assert.ok((await row('ctsi').locator('[data-edit]').boundingBox()).height>=44);if(process.env.POCKET_SCREENSHOT)await page.screenshot({path:process.env.POCKET_SCREENSHOT});
- assert.match(await page.locator('[data-footer-version]').innerText(),/0\.3\.4/);
+ assert.match(await page.locator('[data-footer-version]').innerText(),/0\.3\.5/);
  console.log('PASS: stock decimals, Binance streamed decimals, tiny crypto prices/targets, missing quote, edit and persistence, responsive layout'+(live?' LIVE':''));
 }finally{await browser.close();server?.close();}
