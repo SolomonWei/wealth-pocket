@@ -14,3 +14,17 @@ test('crypto input accepts base tickers, full-width text and existing pairs with
 test('legacy stored USDT rate migrates to USD without changing holdings',()=>{const s=demoState();s.fx={USD:30,USDT:35};const before=JSON.stringify(s.records);validateState(s);assert.equal(s.fx.USDT,30);assert.equal(JSON.stringify(s.records),before);});
 
 test('property mortgage counts as debt once, supports negative equity and preserves standalone loans',()=>{const s=emptyState();s.records=[{id:'home',name:'Home',kind:'property',currency:'USD',amount:100000,principal:120000},{id:'other',name:'Other loan',kind:'loan',currency:'TWD',amount:5000}];validateState(s);const t=totals(s);assert.equal(t.assets,3200000);assert.equal(t.debts,3845000);assert.equal(t.net,-645000);assert.equal(t.marginDebt,0);assert.equal(valuation(s.records[0],{},s.fx).net,-640000);assert.equal(s.records.length,2);});
+
+test('category equity deducts related debt and interest in TWD and reconciles with total net worth',()=>{
+ const s=emptyState();s.fx={USD:30,USDT:30};s.records=[
+  {kind:'property',currency:'TWD',amount:60000000,principal:48000000},
+  {kind:'us',symbol:'AAPL',currency:'USD',quantity:10,manualPrice:100,principal:400,accrued:10,rate:10,since:'2025-01-01'},
+  {kind:'cash',currency:'TWD',amount:100000},
+  {kind:'loan',currency:'TWD',amount:50000}
+ ];
+ const t=totals(s,{},'2026-01-01');assert.equal(t.groups.property,60000000);assert.equal(t.groupNet.property,12000000);assert.equal(t.groupDebts.us,13500);assert.equal(t.groupNet.us,16500);assert.equal(t.groupNet.loan,-50000);assert.equal(Object.values(t.groupNet).reduce((a,b)=>a+b,0),t.net);
+});
+test('category equity retains underwater and missing-price debt without hiding incomplete totals',()=>{
+ const s=emptyState();s.records=[{kind:'property',currency:'TWD',amount:100,principal:150},{kind:'us',symbol:'AAPL',currency:'USD',quantity:1,principal:20}];
+ const t=totals(s);assert.equal(t.groupNet.property,-50);assert.equal(t.groupNet.us,-640);assert.equal(t.groupMissing.us,1);assert.equal(t.groupMissing.property,0);assert.equal(Object.values(t.groupNet).reduce((a,b)=>a+b,0),t.net);
+});

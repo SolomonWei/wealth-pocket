@@ -54,8 +54,11 @@ export function valuation(r,quotes,fx,asOf=today()) {
 export function totals(state,quotes={},asOf=today()) {
   let assets=0,debts=0,liquidAssets=0,marginDebt=0,missing=0,manual=0;
   const groups=Object.fromEntries(Object.keys(kinds).filter(k=>k!=='loan').map(k=>[k,0]));
-  for(const r of state.records){const v=valuation(r,quotes,state.fx,asOf);if(v.asset===null)missing++;else{assets+=v.asset;if(r.kind!=='loan')groups[r.kind]+=v.asset;if(r.kind!=='property')liquidAssets+=v.asset;}debts+=v.debt;if(marketKinds.includes(r.kind))marginDebt+=v.debt;if(marketKinds.includes(r.kind)&&v.price!==null&&!v.q)manual++;}
-  return {assets,debts,net:assets-debts,liquidAssets,marginDebt,financialEquity:liquidAssets-marginDebt,missing,manual,groups};
+  const groupDebts=Object.fromEntries(Object.keys(kinds).map(k=>[k,0]));
+  const groupMissing=Object.fromEntries(Object.keys(kinds).map(k=>[k,0]));
+  for(const r of state.records){const v=valuation(r,quotes,state.fx,asOf);groupDebts[r.kind]+=v.debt;if(v.asset===null)groupMissing[r.kind]++;if(v.asset===null)missing++;else{assets+=v.asset;if(r.kind!=='loan')groups[r.kind]+=v.asset;if(r.kind!=='property')liquidAssets+=v.asset;}debts+=v.debt;if(marketKinds.includes(r.kind))marginDebt+=v.debt;if(marketKinds.includes(r.kind)&&v.price!==null&&!v.q)manual++;}
+  const groupNet=Object.fromEntries(Object.keys(kinds).map(k=>[k,(groups[k]||0)-groupDebts[k]]));
+  return {assets,debts,net:assets-debts,liquidAssets,marginDebt,financialEquity:liquidAssets-marginDebt,missing,manual,groups,groupDebts,groupMissing,groupNet};
 }
 export function demoState(){const s=emptyState();s.records=[
   {id:'d1',kind:'tw',name:'台積電',symbol:'2330',currency:'TWD',quantity:1000,cost:900,manualPrice:1000,principal:500000,accrued:1250,rate:6,since:today()},
