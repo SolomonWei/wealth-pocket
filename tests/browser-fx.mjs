@@ -10,17 +10,17 @@ try {
   const saved=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('pocket-assets-v1')));
   await page.goto('http://127.0.0.1:4173');
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pocket-assets-v1'))?.fx.USD===31.645);
-  assert.equal((await saved()).fx.USDT,32);
+  assert.equal((await saved()).fx.USDT,31.645);
   await page.locator('#mobile-nav [data-tab=settings]').click();
   assert.equal(await page.locator('[name=USD]').isDisabled(),true);
   await page.locator('[name=fxMode]').selectOption('manual');await page.locator('[name=USD]').fill('30');await page.locator('#fx-form button').click();
-  await page.reload();assert.equal((await saved()).fx.USD,30);
+  await page.reload();assert.equal((await saved()).fx.USD,30);assert.equal((await saved()).fx.USDT,30);assert.equal(await page.locator('[name=USDT]').count(),0);assert.equal(await page.locator('[data-app-version]').textContent(),'v0.2.0');await page.locator('[data-action=reload-app]').click();await page.waitForURL('**?_update=*#settings');assert.equal((await saved()).fx.USD,30);
   await page.locator('[name=fxMode]').selectOption('bot');await page.locator('#fx-form button').click();
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pocket-assets-v1')).fx.USD===31.645);
   available=false;await page.reload();await page.waitForFunction(()=>document.querySelector('[data-bank-status]')?.textContent.includes('更新延遲'));
-  assert.equal((await saved()).fx.USD,31.645);assert.equal((await saved()).fx.USDT,32);
+  assert.equal((await saved()).fx.USD,31.645);assert.equal((await saved()).fx.USDT,31.645);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   await page.screenshot({path:'artifacts/iphone-fx-settings.png'});
-  console.log('PASS: automatic bank rate, independent USDT, manual override/reload, source failure preserves verified rate, mobile layout.');
+  console.log('PASS: automatic bank rate, USDT follows USD, manual override/reload, source failure preserves verified rate, mobile layout.');
 } finally {await browser.close();server.close();}

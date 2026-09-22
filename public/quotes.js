@@ -1,4 +1,4 @@
-import {keyFor} from './model.js';
+import {keyFor} from './model.js?v=0.2.0';
 export function parseFugle(m) {
   const d=m.data;if(!['data','snapshot'].includes(m.event)||!d||d.isTrial||!(d.price>0)||!Number.isFinite(d.time))return null;
   return {key:`tw:${d.symbol}`,price:d.price,time:Math.floor(d.time/1000),source:'Fugle 即時成交',feed:'tw'};

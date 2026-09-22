@@ -37,6 +37,8 @@ class TableParser(HTMLParser):
 
 
 def parse_bot(html):
+    if re.search(r"<title>\s*Challenge Validation\s*</title>", html, re.I):
+        raise ValueError("BOT returned Challenge Validation instead of exchange-rate data")
     parser = TableParser()
     parser.feed(html)
     price = None
@@ -71,7 +73,7 @@ def main():
         result['status'] = 'ok'
         print('BOT USD spot-buy:', result['rate'], result['quotedAt'])
     except Exception as error:
-        print('::warning::BOT quote refresh unavailable (' + type(error).__name__ + '); retaining previous verified quote if available')
+        print('::warning::BOT quote refresh unavailable (' + type(error).__name__ + ': ' + str(error).replace('\n', ' ')[:180] + '); retaining previous verified quote if available')
         try:
             previous = json.loads(fetch(PREVIOUS))
             if previous.get('sourceUrl') == SOURCE and previous.get('rateType') == 'USD 即期買入' and isinstance(previous.get('rate'), (int, float)) and 1 < previous['rate'] < 1000 and previous.get('quotedAt'):

@@ -35,6 +35,7 @@ export function validateState(s) {
   for(const [rows,watch] of [[s.records,false],[s.watch,true]]) for(const r of rows){validateRecord(r,watch);if(ids.has(r.id))throw Error('備份有重複編號');ids.add(r.id);}
   for(const c of ['USD','USDT']) if(!Number.isFinite(s.fx?.[c])||s.fx[c]<=0||s.fx[c]>1e6)throw Error('請填寫有效的換算匯率');
   if(s.fxMode!==undefined&&!['bot','manual'].includes(s.fxMode))throw Error('匯率來源不正確');
+  s.fx={...s.fx,USDT:s.fx.USD};
   return s;
 }
 export function interest(r,asOf=today()) {
@@ -45,7 +46,7 @@ export function interest(r,asOf=today()) {
 export function valuation(r,quotes,fx,asOf=today()) {
   const market=marketKinds.includes(r.kind), q=quotes[keyFor(r)];
   const price=market?(q?.price??r.manualPrice??null):null;
-  const rate=r.currency==='TWD'?1:fx[r.currency];
+  const rate=r.currency==='TWD'?1:fx[r.currency==='USDT'?'USD':r.currency];
   const asset=r.kind==='loan'?0:market?(price===null?null:r.quantity*price):r.amount;
   const debt=(r.kind==='loan'?r.amount:(r.principal||0))+interest(r,asOf);
   return {asset:asset===null?null:asset*rate,debt:debt*rate,net:asset===null?null:(asset-debt)*rate,price,q,interest:interest(r,asOf),pnl:market&&price!==null&&r.cost!==null&&r.cost!==undefined?(price-r.cost)*r.quantity*rate:null};

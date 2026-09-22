@@ -14,7 +14,7 @@ Node 22+: `npm start`, then open http://localhost:4173. `npm test` runs financia
 - Net worth = gross asset values minus outstanding principal and interest. Missing quotes produce an explicit partial total, never a silently complete balance.
 - Watchlist with target-price indicators, separate from holdings. No background alerts.
 - Local JSON persistence, explicit import replacement, backup export, independent demo mode, amount masking.
-- USD/TWD defaults to Bank of Taiwan USD spot-buy, with quotation time and a manual override. USDT/TWD remains independently manual. Default 32 is a labeled placeholder until a quote is available.
+- USD/TWD defaults to Bank of Taiwan USD spot-buy, with quotation time and a manual override. USDT is valued using the same USD/TWD rate (1 USDT = 1 USD for this portfolio estimate). Legacy backups are normalized on load without changing holdings. Default 32 is a labeled placeholder until a quote is available.
 - GitHub Actions checks the official bank page about every 15 minutes (schedules may be delayed). A failed refresh retains the previous verified quote with a stale status; no quote is fabricated. The app checks the published snapshot every 5 minutes while open.
 
 ## Quote connections
@@ -35,3 +35,7 @@ The GitHub Pages app is publicly accessible; each visitor sees their own browser
 ## Validation
 
 Financial tests cover financing, missing quotes, currency conversion, interest, P&L, invalid imports and feed normalization. Browser checks cover mobile sizing, CRUD, demo isolation, watchlist exclusion and reload persistence. Authenticated Fugle/Alpaca live feeds require user-owned API credentials to validate end to end.
+
+## App updates
+
+Current version: 0.2.0, shown in Settings and the footer. Reload the existing Home Screen app to pick up deployments; reinstalling is unnecessary. Settings includes a reload button. Versioned asset URLs refresh changed scripts and styles. Reloading preserves local portfolio storage; in-memory quote keys need to be entered again.
