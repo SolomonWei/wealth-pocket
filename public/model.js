@@ -62,6 +62,5 @@ export function demoState(){const s=emptyState();s.records=[
   {id:'d2',kind:'us',name:'NVIDIA',symbol:'NVDA',currency:'USD',quantity:100,cost:100,manualPrice:120,principal:0},
   {id:'d3',kind:'crypto',name:'Bitcoin',symbol:'BTCUSDT',currency:'USDT',quantity:0.5,cost:50000,manualPrice:60000,principal:0},
   {id:'d4',kind:'cash',name:'台幣存款',currency:'TWD',amount:800000},
-  {id:'d5',kind:'property',name:'自住房產',currency:'TWD',amount:18000000},
-  {id:'d6',kind:'loan',name:'房屋貸款',currency:'TWD',amount:10000000,accrued:0,rate:0}
+  {id:'d5',kind:'property',name:'自住房產',currency:'TWD',amount:18000000,principal:10000000,accrued:0,rate:0}
 ];s.watch=[{id:'w1',kind:'us',name:'Apple',symbol:'AAPL',currency:'USD',manualPrice:200,target:180},{id:'w2',kind:'crypto',name:'Ethereum',symbol:'ETHUSDT',currency:'USDT',manualPrice:3000,target:2800}];return s;}

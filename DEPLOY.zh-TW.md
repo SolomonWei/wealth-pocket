@@ -29,8 +29,10 @@ GitHub Free 的 Pages 可用於公開儲存庫；付費方案對私有儲存庫�
 
 ## 目前狀態
 
-已通過財務計算、行情解析與手機瀏覽器測試。已實測接收到 Binance 公開 WebSocket 行情。Yahoo 服務已在本機實测取得上市、上櫃及美股報價，仍需 Cloudflare 部署後確認正式環境。
+已通過財務計算、行情解析與手機瀏覽器測試。已實測接收到 Binance 公開 WebSocket 行情。Yahoo 服務已在本機實测取得上市、上櫃及美股報價，已部署至 wealth-pocket-quotes.solomonwei-pocket.workers.dev。
 
 部署目標為 SolomonWei/wealth-pocket，使用 GitHub Actions 發布到 GitHub Pages。只有 public/ 內的網站程式被發布，使用者的持倉和 API 金鑰不在儲存庫中。
 
 目前 App 版本 v0.3.0，可於設定與頁尾確認。更新不必重加 iPhone 主畫面，使用設定內「重新載入最新版」即可；本機持倉保留，不需行情金鑰。
+
+房產可直接輸入持分估值與剩餘房貸（未償本金），同時顯示房產淨值。若同一筆房貸原本獨立列為貸款，移到房產後請移除重複紀錄。

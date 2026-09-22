@@ -19,3 +19,5 @@ App 仍放在 GitHub Pages。Yahoo 不提供讓該網站直接讀取報價的 CO
 CORS 僅允許 `https://solomonwei.github.io`。它是瀏覽器來源限制，不是帳號登入或完整防濫用機制。每次最多 20 個代碼，固定只向 Yahoo 查詢，不接受任意目標網址。
 
 官方部署文件：https://developers.cloudflare.com/workers/get-started/dashboard/
+
+本專案報價服務已部署：https://wealth-pocket-quotes.solomonwei-pocket.workers.dev 。不需使用者重做以上步驟；此說明保留供移轉帳號時使用。

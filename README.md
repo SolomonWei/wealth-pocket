@@ -37,4 +37,6 @@ Financial tests cover financing, missing quotes, currency conversion, interest, 
 
 ## App updates
 
-Prepared version: 0.3.0. Deploy the Worker and set its URL before publishing. Version is shown in Settings and the footer. Reload the existing Home Screen app to update; no reinstall or quote keys are needed. Local portfolio storage is preserved.
+Current version: 0.3.0. The Yahoo gateway is deployed at https://wealth-pocket-quotes.solomonwei-pocket.workers.dev. Version is shown in Settings and the footer. Reload the existing Home Screen app to update; no reinstall or quote keys are needed. Local portfolio storage is preserved.
+
+Property records include outstanding mortgage principal and optional accrued/estimated interest. Gross property value stays in assets, mortgage debt stays in liabilities, and the property row displays net equity. Existing standalone loan records are preserved; do not record the same mortgage twice.

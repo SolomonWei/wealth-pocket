@@ -4,3 +4,7 @@ artifacts/
 wealth-pocket-*.zip
 __pycache__/
 *.pyc
+
+.wrangler/
+.dev.vars*
+.env*
