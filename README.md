@@ -38,4 +38,6 @@ Financial tests cover financing, missing quotes, currency conversion, interest, 
 
 ## App updates
 
-Current version: 0.2.0, shown in Settings and the footer. Reload the existing Home Screen app to pick up deployments; reinstalling is unnecessary. Settings includes a reload button. Versioned asset URLs refresh changed scripts and styles. Reloading preserves local portfolio storage; in-memory quote keys need to be entered again.
+Current version: 0.2.1, shown in Settings and the footer. Reload the existing Home Screen app to pick up deployments; reinstalling is unnecessary. Settings includes a reload button. Versioned asset URLs refresh changed scripts and styles. Reloading preserves local portfolio storage; in-memory quote keys need to be entered again.
+
+Version 0.2.1 makes asset edit controls prominent and shows live provider authentication, subscription, error and last-quote status in Settings. Status updates preserve unfinished form inputs. Credentials can be verified before adding symbols. Browser connection tests use mocked provider messages; user credentials are still required for authenticated end-to-end validation.

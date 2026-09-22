@@ -33,4 +33,4 @@ GitHub Free 的 Pages 可用於公開儲存庫；付費方案對私有儲存庫�
 
 部署目標為 SolomonWei/wealth-pocket，使用 GitHub Actions 發布到 GitHub Pages。只有 public/ 內的網站程式被發布，使用者的持倉和 API 金鑰不在儲存庫中。
 
-目前 App 版本 v0.2.0，可於設定與頁尾確認。更新不必重加 iPhone 主畫面，使用設定內「重新載入最新版」即可；本機持倉保留，行情金鑰需重新填入。
+目前 App 版本 v0.2.1，可於設定與頁尾確認。更新不必重加 iPhone 主畫面，使用設定內「重新載入最新版」即可；本機持倉保留，行情金鑰需重新填入。

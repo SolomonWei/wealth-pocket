@@ -1,4 +1,4 @@
-import {keyFor} from './model.js?v=0.2.0';
+import {keyFor} from './model.js?v=0.2.1';
 export function parseFugle(m) {
   const d=m.data;if(!['data','snapshot'].includes(m.event)||!d||d.isTrial||!(d.price>0)||!Number.isFinite(d.time))return null;
   return {key:`tw:${d.symbol}`,price:d.price,time:Math.floor(d.time/1000),source:'Fugle 即時成交',feed:'tw'};
@@ -18,31 +18,34 @@ export class QuoteStreams {
     this.stop();const gen=this.generation;
     for(const kind of ['tw','us','crypto']){
       const symbols=[...new Set(rows.filter(r=>r.kind===kind).map(r=>r.symbol))];
-      if(!symbols.length){this.onStatus(kind,'尚未加入標的');continue;}
-      if((kind==='tw'&&!credentials.fugle)||(kind==='us'&&(!credentials.alpacaKey||!credentials.alpacaSecret))){this.onStatus(kind,'待連接行情');continue;}
+      if(!symbols.length&&kind==='crypto'){this.onStatus(kind,'尚未加入標的');continue;}
+      if((kind==='tw'&&!credentials.fugle)||(kind==='us'&&(!credentials.alpacaKey||!credentials.alpacaSecret))){this.onStatus(kind,kind==='us'&&(credentials.alpacaKey||credentials.alpacaSecret)?'請填齊 Key ID 與 Secret':'尚未設定金鑰');continue;}
       let retries=0;
       const connect=()=>{
         if(gen!==this.generation)return;
         this.onStatus(kind,retries?'正在重新連線':'連線中');
         const url=kind==='crypto'?`wss://data-stream.binance.vision/stream?streams=${symbols.map(s=>s.toLowerCase()+'@ticker').join('/')}`:kind==='tw'?'wss://api.fugle.tw/marketdata/v1.0/stock/streaming':`wss://stream.data.alpaca.markets/v2/${credentials.usFeed==='sip'?'sip':'iex'}`;
-        let terminal=false;const socket=new WebSocket(url);this.sockets.push(socket);
+        let terminal=false,authTimeout;const socket=new WebSocket(url);this.sockets.push(socket);
         const timeout=setTimeout(()=>{if(gen===this.generation&&socket.readyState!==WebSocket.OPEN)socket.close();},15000);this.timers.push(timeout);
         socket.onopen=()=>{clearTimeout(timeout);if(gen!==this.generation){socket.close();return;}retries=0;
+          if(kind!=='crypto'){this.onStatus(kind,'連線已建立 · 正在驗證金鑰');authTimeout=setTimeout(()=>{if(gen!==this.generation)return;terminal=true;this.onStatus(kind,'金鑰驗證逾時 · 請重新連接');socket.close();},12000);this.timers.push(authTimeout);}
           if(kind==='tw')socket.send(JSON.stringify({event:'auth',data:{apikey:credentials.fugle}}));
           else if(kind==='us')socket.send(JSON.stringify({action:'auth',key:credentials.alpacaKey,secret:credentials.alpacaSecret}));
           else this.onStatus(kind,'已連線，等待行情');
         };
         socket.onmessage=e=>{if(gen!==this.generation)return;let payload;try{payload=JSON.parse(e.data);}catch{return;}
           for(const m of Array.isArray(payload)?payload:[payload]){
-            if(m.event==='error'||m.T==='error'){terminal=true;this.onStatus(kind,`行情錯誤：${String(m.data?.message||m.msg||'請檢查權限').slice(0,150)}`);socket.close();return;}
-            if(kind==='tw'&&m.event==='authenticated'){socket.send(JSON.stringify({event:'subscribe',data:{channel:'trades',symbols}}));this.onStatus(kind,'已連線，等待成交');}
-            if(kind==='us'&&m.T==='success'&&m.msg==='authenticated'){socket.send(JSON.stringify({action:'subscribe',trades:symbols}));this.onStatus(kind,'已連線，等待成交');}
+            if(m.event==='error'||m.T==='error'){terminal=true;clearTimeout(authTimeout);this.onStatus(kind,`行情錯誤：${String(m.data?.message||m.msg||'請檢查權限').slice(0,150)}`);socket.close();return;}
+            if(kind==='tw'&&m.event==='authenticated'){clearTimeout(authTimeout);if(symbols.length)socket.send(JSON.stringify({event:'subscribe',data:{channel:'trades',symbols}}));this.onStatus(kind,symbols.length?'金鑰驗證成功 · 正在訂閱':'金鑰驗證成功 · 尚未加入台股標的');}
+            if(kind==='tw'&&m.event==='subscribed')this.onStatus(kind,'已訂閱 · 等待成交');
+            if(kind==='us'&&m.T==='success'&&m.msg==='authenticated'){clearTimeout(authTimeout);if(symbols.length)socket.send(JSON.stringify({action:'subscribe',trades:symbols}));this.onStatus(kind,symbols.length?'金鑰驗證成功 · 正在訂閱':'金鑰驗證成功 · 尚未加入美股標的');}
+            if(kind==='us'&&m.T==='subscription'&&m.trades?.length)this.onStatus(kind,'已訂閱 · 等待成交');
             const q=kind==='tw'?parseFugle(m):kind==='us'?parseAlpaca(m,credentials.usFeed):parseBinance(m);
             if(q&&symbols.some(s=>keyFor({kind,symbol:s})===q.key)){this.onStatus(kind,'行情串流中');this.onQuote(q);}
           }
         };
         socket.onerror=()=>{if(gen===this.generation&&!terminal)this.onStatus(kind,'連線異常');};
-        socket.onclose=()=>{clearTimeout(timeout);this.sockets=this.sockets.filter(s=>s!==socket);if(gen!==this.generation||terminal)return;this.onStatus(kind,'已斷線，將重連');this.timers.push(setTimeout(connect,Math.min(30000,1000*2**retries++)));};
+        socket.onclose=()=>{clearTimeout(timeout);clearTimeout(authTimeout);this.sockets=this.sockets.filter(s=>s!==socket);if(gen!==this.generation||terminal)return;this.onStatus(kind,'已斷線，將重連');this.timers.push(setTimeout(connect,Math.min(30000,1000*2**retries++)));};
       };connect();
     }
   }
