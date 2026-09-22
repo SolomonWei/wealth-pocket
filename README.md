@@ -19,14 +19,13 @@ Node 22+: `npm start`, then open http://localhost:4173. `npm test` runs financia
 
 ## Quote connections
 
-- Binance public WebSocket tickers: https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md
-- Fugle browser WebSocket API key: https://developer.fugle.tw/docs/data/websocket-api/getting-started/
-- Alpaca WebSocket API key/secret with IEX or authorized SIP feed: https://docs.alpaca.markets/us/docs/streaming-market-data
-- App rights do not guarantee API rights for Futu: https://openapi.futunn.com/futu-api-doc/en/intro/authority.html
-
-Credentials are kept only in page memory and sent directly to the selected provider. They are never included in localStorage, backups, or application source. Prefer market-data/paper-account keys. The app has no trading endpoints. Never paste broker login passwords into the app.
-
-Market quote timestamps and connection status are visible. Feed permissions, provider latency, market activity, and network conditions affect timeliness. No fixed end-to-end latency is promised. Stock streaming starts with future trades; before a first quote, manual values can be used. Last received quotes are cached with timestamps. Disconnects retry with capped exponential backoff. The app pauses connections in the background and reconnects in the foreground. No background fetch, server data storage, or device synchronization.
+- Taiwan and US equities use Yahoo Finance delayed quotes via the owner's Cloudflare Worker in `worker/quotes.mjs`. No end-user credentials. Yahoo's public chart endpoint is unofficial and can change or rate-limit; failures remain visible and preserve previous prices.
+- Configure `public/market-config.json` with the deployed Worker HTTPS origin before publishing this version. An empty URL explicitly shows that the service is not enabled. See `worker/SETUP.zh-TW.md`.
+- The browser sends only market/ticker codes. It never sends quantities, costs, bank balances, property values or credentials to the Worker. The Worker has no portfolio database. Quote requests may appear in hosting access logs.
+- The gateway allows only Yahoo chart requests, validates symbols/currency/timestamps, limits each batch to 20, and caches successful quotes for 60 seconds. Taiwan symbols resolve `.TW` first and `.TWO` only on a not-found response.
+- The app checks equities about every minute while open. Taiwan Yahoo quotes are normally 20 minutes delayed; US timing depends on Yahoo's source. Refresh frequency does not remove source delay. Each price displays its source timestamp.
+- Binance public WebSocket tickers remain automatic: https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md
+- Connections pause in the background and restart in the foreground. No background fetch or portfolio synchronization.
 
 ## Persistence boundaries
 
@@ -34,10 +33,8 @@ The GitHub Pages app is publicly accessible; each visitor sees their own browser
 
 ## Validation
 
-Financial tests cover financing, missing quotes, currency conversion, interest, P&L, invalid imports and feed normalization. Browser checks cover mobile sizing, CRUD, demo isolation, watchlist exclusion and reload persistence. Authenticated Fugle/Alpaca live feeds require user-owned API credentials to validate end to end.
+Financial tests cover financing, missing quotes, currency conversion, interest, P&L and invalid imports. Yahoo tests cover Taiwan OTC resolution, share classes, metadata validation, CORS, partial errors and rate limits. Browser checks cover mobile sizing, CRUD, demo isolation, watchlist exclusion, reload persistence, automatic Yahoo prices without credentials and failure fallback.
 
 ## App updates
 
-Current version: 0.2.1, shown in Settings and the footer. Reload the existing Home Screen app to pick up deployments; reinstalling is unnecessary. Settings includes a reload button. Versioned asset URLs refresh changed scripts and styles. Reloading preserves local portfolio storage; in-memory quote keys need to be entered again.
-
-Version 0.2.1 makes asset edit controls prominent and shows live provider authentication, subscription, error and last-quote status in Settings. Status updates preserve unfinished form inputs. Credentials can be verified before adding symbols. Browser connection tests use mocked provider messages; user credentials are still required for authenticated end-to-end validation.
+Prepared version: 0.3.0. Deploy the Worker and set its URL before publishing. Version is shown in Settings and the footer. Reload the existing Home Screen app to update; no reinstall or quote keys are needed. Local portfolio storage is preserved.
